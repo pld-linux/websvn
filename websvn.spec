@@ -1,5 +1,5 @@
-Summary:	websvn
-Summary(pl):	websvn
+Summary:	WebSVN
+Summary(pl):	WebSVN - przegl±darka WWW repozytoriów Subversion
 Name:		websvn
 Version:	1.39
 Release:	0.1
@@ -24,7 +24,6 @@ differences between 2 versions of a file so as to see exactly what was
 changed in a particular revision.
 
 WebSVN offers the following features:
-
  - Easy to use interface
  - Highly customisable templating system
  - Log message searching
@@ -34,6 +33,25 @@ WebSVN offers the following features:
 
 Since it's written using PHP, WebSVN is also very portable and easy to
 install.
+
+%description -l pl
+WebSVN oferuje widok na repozytoria Subversion, zaprojektowany w
+sposób odzwierciedlaj±cy metodologiê Subversion. Mo¿na ogl±daæ logi
+dowolnego pliku lub katalogu, zobaczyæ listê wszystkich zmienionych,
+dodanych i usuniêtych w danej rewizji plików. Mo¿na tak¿e ogl±daæ
+ró¿nice miêdzy 2 wersjami pliku, aby zobaczyæ co dok³adnie siê
+zmieni³o w danej rewizji.
+
+WebSVN oferuje nastêpuj±ce mo¿liwo¶ci:
+ - ³atwy w u¿yciu interfejs
+ - wysoko konfigurowalny system szablonów
+ - przeszukiwanie logów
+ - kolorowanie listingów plików
+ - szybkie przegl±danie dziêki wewnêtrznemu buforowaniu
+ - obs³ugê MultiViews w Apache'u.
+
+Poniewa¿ WebSVN jest napisany w PHP, jest przeno¶ny i ³atwy w
+instalacji.
 
 %prep
 %setup -q -n WebSVN
