@@ -1,13 +1,12 @@
 Summary:	WebSVN - web interface of Subversion repositories
 Summary(pl):	WebSVN - przegl±darka WWW repozytoriów Subversion
 Name:		websvn
-Version:	1.50
-Release:	0.3
+Version:	1.61
+Release:	0.1
 Epoch:		0
 License:	GPL
 Group:		Development/Tools
-Source0:	http://websvn.tigris.org/files/documents/1380/14334/WebSVN_150.tar.gz
-# Source0-md5:	870f02b66c3082767de296dcc54b049f
+Source0:	http://websvn.tigris.org/files/documents/1380/14334/WebSVN_161.tar.gz
 URL:		http://websvn.tigris.org/
 Requires:	apache
 Requires:	php-pear
@@ -122,8 +121,15 @@ rm -fr %{_var}/cache/%{name}/*
 %lang(de) %{_websvndir}/languages/german.inc
 %lang(fr) %{_websvndir}/languages/french.inc
 %lang(ja) %{_websvndir}/languages/japanese*.inc
+%lang(ko) %{_websvndir}/languages/korean-euc.inc
+%lang(ko) %{_websvndir}/languages/korean-utf8.inc
 %lang(pt) %{_websvndir}/languages/portuguese.inc
+%lang(ru) %{_websvndir}/languages/russian.inc
+%lang(es) %{_websvndir}/languages/spanish.inc
 %lang(se) %{_websvndir}/languages/swedish.inc
+%lang(zh_TW) %{_websvndir}/languages/tchinese-utf8.inc
+%lang(zh_TW) %{_websvndir}/languages/tchinese.inc
+
 %{_websvndir}/temp
 %{_websvndir}/templates
 %attr(700,http,root) %{_var}/cache/%{name}
