@@ -1,1 +1,12 @@
-Only for 1.40beta on DEVEL
+diff -Nura WebSVN.orig/include/version.inc WebSVN/include/version.inc
+--- WebSVN.orig/include/version.inc	2004-06-09 03:13:03.000000000 +0200
++++ WebSVN/include/version.inc	2004-06-09 03:14:39.000000000 +0200
+@@ -23,5 +23,5 @@
+ //
+ // Version information
+ 
+-$version = "1.39";
+-?>
+\ Brak znaku nowej linii na koñcu pliku
++$version = "1.40";
++?>
