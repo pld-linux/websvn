@@ -6,7 +6,7 @@ Release:	0.1
 Epoch:		0
 License:	GPL
 Group:		Development/Tools
-Source0:	WebSVN_139.tar.gz
+Source0:	http://websvn.tigris.org/files/documents/1380/10659/WebSVN_139.tar.gz
 # Source0-md5:	c6060310af4f8a478ddf90d8d6fa00a9
 URL:		http://websvn.tigris.org/
 Requires:	apache
