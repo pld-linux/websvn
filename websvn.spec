@@ -106,7 +106,7 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 %postun
-rm -fr %{_var}/cache/%{name}
+rm -fr %{_var}/cache/%{name}/*
 
 %files
 %defattr(644,root,root,755)
