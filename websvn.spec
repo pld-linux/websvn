@@ -7,6 +7,7 @@ Epoch:		0
 License:	GPL
 Group:		Development/Tools
 Source0:	http://websvn.tigris.org/files/documents/1380/14334/WebSVN_161.tar.gz
+# Source0-md5:	9f81a3793d08bde2e425d2c98f923875
 URL:		http://websvn.tigris.org/
 Requires:	apache
 Requires:	php-pear
