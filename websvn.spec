@@ -2,13 +2,12 @@ Summary:	WebSVN - web interface of Subversion repositories
 Summary(pl):	WebSVN - przegl±darka WWW repozytoriów Subversion
 Name:		websvn
 Version:	1.50
-Release:	0.2
+Release:	0.3
 Epoch:		0
 License:	GPL
 Group:		Development/Tools
 Source0:	http://websvn.tigris.org/files/documents/1380/14334/WebSVN_150.tar.gz
 # Source0-md5:	870f02b66c3082767de296dcc54b049f
-#Patch0:		%{name}-ver.patch
 URL:		http://websvn.tigris.org/
 Requires:	apache
 Requires:	php-pear
@@ -59,7 +58,6 @@ instalacji.
 
 %prep
 %setup -q -n WebSVN
-#%%patch0 -p1
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -77,8 +75,8 @@ install	templates/Standard/*			$RPM_BUILD_ROOT%{_websvndir}/templates/Standard
 rm -fr	cache temp
 ln -sf	%{_var}/cache/%{name}/temp		$RPM_BUILD_ROOT%{_websvndir}/temp
 ln -sf	%{_var}/cache/%{name}			$RPM_BUILD_ROOT%{_websvndir}/cache
-ln -sf	%{_sysconfdir}/websvn.conf		$RPM_BUILD_ROOT%{_websvndir}/include/config.inc
-echo 	Alias /websvn /usr/share/websvn >	$RPM_BUILD_ROOT%{_sysconfdir}/httpd/websvn.conf
+ln -sf	%{_sysconfdir}/%{name}.conf		$RPM_BUILD_ROOT%{_websvndir}/include/config.inc
+echo 	Alias "/%{name}" "%{_websvndir}" >	$RPM_BUILD_ROOT%{_sysconfdir}/httpd/%{name}.conf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
