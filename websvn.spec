@@ -1,4 +1,4 @@
-Summary:	WebSVN
+Summary:	WebSVN - web interface of Subversion repositories
 Summary(pl):	WebSVN - przegl±darka WWW repozytoriów Subversion
 Name:		websvn
 Version:	1.39
