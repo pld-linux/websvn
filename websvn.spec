@@ -11,6 +11,7 @@ Source0:	http://websvn.tigris.org/files/documents/1380/14334/WebSVN_161.tar.gz
 URL:		http://websvn.tigris.org/
 Requires:	apache
 Requires:	php-pear
+Requires:	php-zlib
 Requires:	subversion
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
