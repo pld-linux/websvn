@@ -2,7 +2,7 @@ Summary:	WebSVN - web interface of Subversion repositories
 Summary(pl):	WebSVN - przegl±darka WWW repozytoriów Subversion
 Name:		websvn
 Version:	1.50
-Release:	0.1
+Release:	0.2
 Epoch:		0
 License:	GPL
 Group:		Development/Tools
@@ -87,7 +87,7 @@ rm -rf $RPM_BUILD_ROOT
 if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*websvn.conf" /etc/httpd/httpd.conf; then
 	echo "Include /etc/httpd/%{name}.conf" >> /etc/httpd/httpd.conf
 elif [ -d /etc/httpd/httpd.conf ]; then
-	mv -f /etc/httpd/%{name}.conf /etc/httpd/httpd.conf/99_%{name}.conf
+	ln -sf /etc/httpd/%{name}.conf /etc/httpd/httpd.conf/99_%{name}.conf
 fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/usr/sbin/apachectl restart 1>&2
