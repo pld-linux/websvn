@@ -1,13 +1,14 @@
 Summary:	WebSVN - web interface of Subversion repositories
 Summary(pl):	WebSVN - przegl±darka WWW repozytoriów Subversion
 Name:		websvn
-Version:	1.39
-Release:	0.1
+Version:	1.40
+Release:	0.beta.1
 Epoch:		0
 License:	GPL
 Group:		Development/Tools
-Source0:	http://websvn.tigris.org/files/documents/1380/10659/WebSVN_139.tar.gz
-# Source0-md5:	c6060310af4f8a478ddf90d8d6fa00a9
+Source0:	http://websvn.tigris.org/files/documents/1380/13981/WebSVN_140beta.tar.gz
+# Source0-md5:	fced148662b41fcf2a8effdfbc982553
+Patch0:		%{name}-ver.patch
 URL:		http://websvn.tigris.org/
 Requires:	apache
 Requires:	php-pear
@@ -53,26 +54,30 @@ WebSVN oferuje nastêpuj±ce mo¿liwo¶ci:
 Poniewa¿ WebSVN jest napisany w PHP, jest przeno¶ny i ³atwy w
 instalacji.
 
+# have mercy and don't move this definition between preamble and descriptions
+%define	_websvndir	%{_datadir}/%{name}
+
 %prep
 %setup -q -n WebSVN
+%patch0 -p1
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 install -d \
 	$RPM_BUILD_ROOT{%{_sysconfdir}/httpd,%{_var}/cache/%{name}/temp} \
-	$RPM_BUILD_ROOT%{_datadir}/%{name}/{include,languages,templates/{BlueGrey,Standard}}
+	$RPM_BUILD_ROOT%{_websvndir}/{include,languages,templates/{BlueGrey,Standard}}
 
-install *.php					$RPM_BUILD_ROOT%{_datadir}/%{name}
+install *.php					$RPM_BUILD_ROOT%{_websvndir}
 mv -f	include/distconfig.inc			$RPM_BUILD_ROOT%{_sysconfdir}/websvn.conf
-install include/*				$RPM_BUILD_ROOT%{_datadir}/%{name}/include
-install languages/*				$RPM_BUILD_ROOT%{_datadir}/%{name}/languages
-install	templates/BlueGrey/*			$RPM_BUILD_ROOT%{_datadir}/%{name}/templates/BlueGrey
-install	templates/Standard/*			$RPM_BUILD_ROOT%{_datadir}/%{name}/templates/Standard
+install include/*				$RPM_BUILD_ROOT%{_websvndir}/include
+install languages/*				$RPM_BUILD_ROOT%{_websvndir}/languages
+install	templates/BlueGrey/*			$RPM_BUILD_ROOT%{_websvndir}/templates/BlueGrey
+install	templates/Standard/*			$RPM_BUILD_ROOT%{_websvndir}/templates/Standard
 rm -fr	cache temp
-ln -sf	%{_var}/cache/%{name}/temp		$RPM_BUILD_ROOT%{_datadir}/%{name}/temp
-ln -sf	%{_var}/cache/%{name}			$RPM_BUILD_ROOT%{_datadir}/%{name}/cache
-ln -sf	%{_sysconfdir}/websvn.conf		$RPM_BUILD_ROOT%{_datadir}/%{name}/include/config.inc
+ln -sf	%{_var}/cache/%{name}/temp		$RPM_BUILD_ROOT%{_websvndir}/temp
+ln -sf	%{_var}/cache/%{name}			$RPM_BUILD_ROOT%{_websvndir}/cache
+ln -sf	%{_sysconfdir}/websvn.conf		$RPM_BUILD_ROOT%{_websvndir}/include/config.inc
 echo 	Alias /websvn /usr/share/websvn >	$RPM_BUILD_ROOT%{_sysconfdir}/httpd/websvn.conf
 
 %clean
@@ -102,11 +107,23 @@ if [ "$1" = "0" ]; then
 		fi
 	fi
 fi
+%postun
+rm -fr %{_var}/cache/%{name}
 
 %files
 %defattr(644,root,root,755)
 %doc changes.txt install.txt templates.txt
-%attr(640,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/*
+%attr(640,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}.conf
 %{_sysconfdir}/httpd/*
-%{_datadir}/%{name}
+%dir %{_websvndir}
+%{_websvndir}/*.php
+%{_websvndir}/cache
+%{_websvndir}/include
+%dir %{_websvndir}/languages
+%{_websvndir}/languages/english.inc
+%lang(de) %{_websvndir}/languages/german.inc
+%lang(fr) %{_websvndir}/languages/french.inc
+%lang(pt) %{_websvndir}/languages/portuguese.inc
+%{_websvndir}/temp
+%{_websvndir}/templates
 %attr(700,http,root) %{_var}/cache/%{name}
