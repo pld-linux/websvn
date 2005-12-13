@@ -9,10 +9,10 @@ Group:		Development/Tools
 Source0:	http://websvn.tigris.org/files/documents/1380/14334/WebSVN_161.tar.gz
 # Source0-md5:	9f81a3793d08bde2e425d2c98f923875
 URL:		http://websvn.tigris.org/
-Requires:	webserver = apache
 Requires:	php-pear
 Requires:	php-zlib
 Requires:	subversion
+Requires:	webserver = apache
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -112,7 +112,7 @@ rm -fr %{_var}/cache/%{name}/*
 %files
 %defattr(644,root,root,755)
 %doc changes.txt install.txt templates.txt
-%attr(640,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}.conf
+%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}.conf
 %{_sysconfdir}/httpd/*
 %dir %{_websvndir}
 %{_websvndir}/*.php
