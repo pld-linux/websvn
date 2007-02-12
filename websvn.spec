@@ -1,7 +1,7 @@
 # TODO
 # - webapps
 Summary:	WebSVN - web interface of Subversion repositories
-Summary(pl.UTF-8):   WebSVN - przeglądarka WWW repozytoriów Subversion
+Summary(pl.UTF-8):	WebSVN - przeglądarka WWW repozytoriów Subversion
 Name:		websvn
 Version:	1.61
 Release:	0.1
