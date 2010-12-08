@@ -1,21 +1,31 @@
 # TODO
-# - webapps
+# - verify %lang codes
+# - protect config, cache and tmp dirs (drop the symlinks)
 Summary:	WebSVN - web interface of Subversion repositories
 Summary(pl.UTF-8):	WebSVN - przeglądarka WWW repozytoriów Subversion
 Name:		websvn
-Version:	1.61
+Version:	2.3.1
 Release:	0.1
-Epoch:		0
 License:	GPL
 Group:		Development/Tools
-Source0:	http://websvn.tigris.org/files/documents/1380/14334/WebSVN_161.tar.gz
+Source0:	http://www.tigris.org/files/documents/1380/47525/%{name}-%{version}.tar.gz
 # Source0-md5:	9f81a3793d08bde2e425d2c98f923875
-URL:		http://websvn.tigris.org/
-Requires:	php(zlib)
+Source1:	apache.conf
+Source2:	lighttpd.conf
+URL:		http://www.websvn.info/
+BuildRequires:	rpmbuild(macros) >= 1.268
+Requires:	php-zlib
 Requires:	subversion
-Requires:	webserver = apache
+Requires:	webapps
+Requires:	webserver
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		_webapps	/etc/webapps
+%define		_webapp		%{name}
+%define		_sysconfdir	%{_webapps}/%{_webapp}
+%define		_appdir		%{_datadir}/%{_webapp}
+%define		_cachedir	%{_var}/cache/%{name}
 
 %description
 WebSVN offers a view onto your subversion repositories that's been
@@ -33,9 +43,6 @@ WebSVN offers the following features:
  - Fast browsing thanks to internal caching feature
  - Apache MultiViews support
 
-Since it's written using PHP, WebSVN is also very portable and easy to
-install.
-
 %description -l pl.UTF-8
 WebSVN oferuje widok na repozytoria Subversion, zaprojektowany w
 sposób odzwierciedlający metodologię Subversion. Można oglądać logi
@@ -52,87 +59,99 @@ WebSVN oferuje następujące możliwości:
  - szybkie przeglądanie dzięki wewnętrznemu buforowaniu
  - obsługę MultiViews w Apache'u.
 
-Ponieważ WebSVN jest napisany w PHP, jest przenośny i łatwy w
-instalacji.
-
-# have mercy and don't move this definition between preamble and descriptions
-%define	_websvndir	%{_datadir}/%{name}
-
 %prep
-%setup -q -n WebSVN
+%setup -q
+
+mv include/distconfig.php include/config.php
 
 %install
 rm -rf $RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_appdir},%{_cachedir}/temp}
 
-install -d \
-	$RPM_BUILD_ROOT{%{_sysconfdir}/httpd,%{_var}/cache/%{name}/temp} \
-	$RPM_BUILD_ROOT%{_websvndir}/{include,languages,templates/{BlueGrey,Standard}}
+cp -a *.php $RPM_BUILD_ROOT%{_appdir}
+cp -a lib templates languages include javascript $RPM_BUILD_ROOT%{_appdir}
 
-install *.php					$RPM_BUILD_ROOT%{_websvndir}
-mv -f	include/distconfig.inc			$RPM_BUILD_ROOT%{_sysconfdir}/websvn.conf
-install include/*				$RPM_BUILD_ROOT%{_websvndir}/include
-install languages/*				$RPM_BUILD_ROOT%{_websvndir}/languages
-install	templates/BlueGrey/*			$RPM_BUILD_ROOT%{_websvndir}/templates/BlueGrey
-install	templates/Standard/*			$RPM_BUILD_ROOT%{_websvndir}/templates/Standard
-rm -fr	cache temp
-ln -sf	%{_var}/cache/%{name}/temp		$RPM_BUILD_ROOT%{_websvndir}/temp
-ln -sf	%{_var}/cache/%{name}			$RPM_BUILD_ROOT%{_websvndir}/cache
-ln -sf	%{_sysconfdir}/%{name}.conf		$RPM_BUILD_ROOT%{_websvndir}/include/config.inc
-echo 	Alias "/%{name}" "%{_websvndir}" >	$RPM_BUILD_ROOT%{_sysconfdir}/httpd/%{name}.conf
+ln -sf %{_cachedir} $RPM_BUILD_ROOT%{_appdir}/cache
+
+mv $RPM_BUILD_ROOT%{_appdir}/include/config.php $RPM_BUILD_ROOT%{_sysconfdir}/config.php
+ln -sf %{_sysconfdir}/config.php $RPM_BUILD_ROOT%{_appdir}/include/config.php
+
+cp -a %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/apache.conf
+cp -a %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/lighttpd.conf
+cp -a $RPM_BUILD_ROOT%{_sysconfdir}/{apache,httpd}.conf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*websvn.conf" /etc/httpd/httpd.conf; then
-	echo "Include /etc/httpd/%{name}.conf" >> /etc/httpd/httpd.conf
-elif [ -d /etc/httpd/httpd.conf ]; then
-	ln -sf /etc/httpd/%{name}.conf /etc/httpd/httpd.conf/99_%{name}.conf
-fi
-if [ -f /var/lock/subsys/httpd ]; then
-	/usr/sbin/apachectl restart 1>&2
+%preun
+if [ "$1" = 0 ]; then
+	rm -rf %{_cachedir}/*
 fi
 
-%preun
-if [ "$1" = "0" ]; then
-	umask 027
-	if [ -d /etc/httpd/httpd.conf ]; then
-		rm -f /etc/httpd/httpd.conf/99_%{name}.conf
-	else
-		grep -v "^Include.*websvn.conf" /etc/httpd/httpd.conf > \
-			/etc/httpd/httpd.conf.tmp
-		mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
-		if [ -f /var/lock/subsys/httpd ]; then
-			/usr/sbin/apachectl restart 1>&2
-		fi
-	fi
-fi
-%postun
-rm -fr %{_var}/cache/%{name}/*
+%triggerin -- apache1 < 1.3.37-3, apache1-base
+%webapp_register apache %{_webapp}
+
+%triggerun -- apache1 < 1.3.37-3, apache1-base
+%webapp_unregister apache %{_webapp}
+
+%triggerin -- apache < 2.2.0, apache-base
+%webapp_register httpd %{_webapp}
+
+%triggerun -- apache < 2.2.0, apache-base
+%webapp_unregister httpd %{_webapp}
+
+%triggerin -- lighttpd
+%webapp_register lighttpd %{_webapp}
+
+%triggerun -- lighttpd
+%webapp_unregister lighttpd %{_webapp}
 
 %files
 %defattr(644,root,root,755)
-%doc changes.txt install.txt templates.txt
-%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}.conf
-%{_sysconfdir}/httpd/*
-%dir %{_websvndir}
-%{_websvndir}/*.php
-%{_websvndir}/cache
-%{_websvndir}/include
-%dir %{_websvndir}/languages
-%{_websvndir}/languages/english.inc
-%lang(de) %{_websvndir}/languages/german.inc
-%lang(fr) %{_websvndir}/languages/french.inc
-%lang(ja) %{_websvndir}/languages/japanese*.inc
-%lang(ko) %{_websvndir}/languages/korean-euc.inc
-%lang(ko) %{_websvndir}/languages/korean-utf8.inc
-%lang(pt) %{_websvndir}/languages/portuguese.inc
-%lang(ru) %{_websvndir}/languages/russian.inc
-%lang(es) %{_websvndir}/languages/spanish.inc
-%lang(se) %{_websvndir}/languages/swedish.inc
-%lang(zh_TW) %{_websvndir}/languages/tchinese-utf8.inc
-%lang(zh_TW) %{_websvndir}/languages/tchinese.inc
+%doc changes.txt
+%dir %attr(750,root,http) %{_sysconfdir}
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/lighttpd.conf
+%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/config.php
+%dir %{_appdir}
+%{_appdir}/*.php
+%{_appdir}/cache
+%{_appdir}/include
+%{_appdir}/javascript
+%{_appdir}/lib
+%{_appdir}/templates
+%dir %{_appdir}/languages
+%{_appdir}/languages/languages.php
+%{_appdir}/languages/english.php
+%lang(de) %{_appdir}/languages/german.php
+%lang(es) %{_appdir}/languages/spanish.php
+%lang(fr) %{_appdir}/languages/french.php
+%lang(ja) %{_appdir}/languages/japanese*.php
+%lang(pt) %{_appdir}/languages/portuguese.php
+%lang(ru) %{_appdir}/languages/russian.php
+%lang(se) %{_appdir}/languages/swedish.php
+%lang(ca) %{_appdir}/languages/catalan.php
+%lang(zh_CN) %{_appdir}/languages/chinese-simplified.php
+%lang(zh_TW) %{_appdir}/languages/chinese-traditional.php
+%lang(cz) %{_appdir}/languages/czech.php
+%lang(da) %{_appdir}/languages/danish.php
+%lang(nl) %{_appdir}/languages/dutch.php
+%lang(fi) %{_appdir}/languages/finnish.php
+%lang(he) %{_appdir}/languages/hebrew.php
+%lang(hi) %{_appdir}/languages/hindi.php
+%lang(hu) %{_appdir}/languages/hungarian.php
+%lang(id) %{_appdir}/languages/indonesian.php
+%lang(it) %{_appdir}/languages/italian.php
+%lang(ko) %{_appdir}/languages/korean.php
+%lang(ma) %{_appdir}/languages/marathi.php
+%lang(nb) %{_appdir}/languages/norwegian.php
+%lang(pl) %{_appdir}/languages/polish.php
+%lang(pt_BR) %{_appdir}/languages/portuguese-br.php
+%lang(sk) %{_appdir}/languages/slovak.php
+%lang(sk) %{_appdir}/languages/slovenian.php
+%lang(tr) %{_appdir}/languages/turkish.php
+%lang(uz) %{_appdir}/languages/uzbek.php
 
-%{_websvndir}/temp
-%{_websvndir}/templates
-%attr(700,http,root) %{_var}/cache/%{name}
+%dir %attr(770,root,http) %{_cachedir}
+%dir %attr(770,root,http) %{_cachedir}/temp
